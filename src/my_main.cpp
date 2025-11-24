@@ -5,7 +5,7 @@
 // #include "ord/OpenRoad.hh"
 #include "odb/db.h"
 
-#include "shinkuan/dataset_generator.hpp"
+#include "shinkuan/placement_applier.hpp"
 #include "shinkuan/logger.hpp"
 
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     const std::string configFile = argv[2];
     const std::string outputDir = argv[3];
 
-    shinkuan::DatasetGenerator dataset_generator;
+    shinkuan::PlacementApplier dataset_generator;
     if (dataset_generator.run(inputODBFile, configFile, outputDir) != 0) {
         logger.error("Dataset generation failed.");
         return 1;

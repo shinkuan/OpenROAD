@@ -443,9 +443,9 @@ add_subdirectory(shinkuan)
 
 
 ################################################################
-# Build my_openroad tool
+# Build placement_applier tool
 
-add_executable(my_openroad
+add_executable(placement_applier
   my_main.cpp
 
   # Design.cc
@@ -454,27 +454,27 @@ add_executable(my_openroad
   # OpenRoad.cc
 )
 
-target_compile_definitions(my_openroad PRIVATE GPU)
-target_compile_definitions(my_openroad PRIVATE BUILD_PYTHON=0)
-target_compile_definitions(my_openroad PRIVATE BUILD_GUI=0)
+target_compile_definitions(placement_applier PRIVATE GPU)
+target_compile_definitions(placement_applier PRIVATE BUILD_PYTHON=0)
+target_compile_definitions(placement_applier PRIVATE BUILD_GUI=0)
 
-set_target_properties(my_openroad PROPERTIES
+set_target_properties(placement_applier PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-target_compile_options(my_openroad
+target_compile_options(placement_applier
   PRIVATE
     -Wextra -pedantic -Wcast-qual
 )
 
-target_compile_features(my_openroad PUBLIC cxx_std_17)
+target_compile_features(placement_applier PUBLIC cxx_std_17)
 
-target_include_directories(my_openroad
+target_include_directories(placement_applier
   PUBLIC
     ../include
 )
 
-target_link_libraries(my_openroad
+target_link_libraries(placement_applier
   # ifp
   # pad
   # ord
@@ -516,45 +516,45 @@ target_link_libraries(my_openroad
   shinkuan
 )
 
-target_compile_definitions(my_openroad PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+target_compile_definitions(placement_applier PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
 
 
 # tclReadline
 if (TCL_READLINE_LIBRARY AND TCL_READLINE_H)
-  target_compile_definitions(my_openroad PRIVATE ENABLE_READLINE)
-  target_link_libraries(my_openroad ${TCL_READLINE_LIBRARY})
-  target_include_directories(my_openroad PRIVATE ${TCL_READLINE_H})
+  target_compile_definitions(placement_applier PRIVATE ENABLE_READLINE)
+  target_link_libraries(placement_applier ${TCL_READLINE_LIBRARY})
+  target_include_directories(placement_applier PRIVATE ${TCL_READLINE_H})
   message(STATUS "TCL readline enabled")
 else()
   message(STATUS "TCL readline disabled")
 endif()
 
 if (BUILD_TCLX AND TCLX_LIBRARY AND TCLX_H)
-  target_compile_definitions(my_openroad PRIVATE ENABLE_TCLX)
-  target_link_libraries(my_openroad ${TCLX_LIBRARY})
-  target_include_directories(my_openroad PRIVATE ${TCLX_H})
+  target_compile_definitions(placement_applier PRIVATE ENABLE_TCLX)
+  target_link_libraries(placement_applier ${TCLX_LIBRARY})
+  target_include_directories(placement_applier PRIVATE ${TCLX_H})
   message(STATUS "Tcl Extended enabled")
 else()
   message(STATUS "Tcl Extended disabled")
 endif()
 
 if (ZLIB_FOUND)
-  target_link_libraries(my_openroad ${ZLIB_LIBRARIES})
+  target_link_libraries(placement_applier ${ZLIB_LIBRARIES})
 endif()
 
 # Optional CUDD library for OpenSTA
 if (CUDD_LIB)
-  target_link_libraries(my_openroad ${CUDD_LIB})
+  target_link_libraries(placement_applier ${CUDD_LIB})
 endif()
 
 if (ZLIB_FOUND)
-  target_link_libraries(my_openroad ${ZLIB_LIBRARIES})
+  target_link_libraries(placement_applier ${ZLIB_LIBRARIES})
 endif()
 
 if (CUDD_LIB)
-  target_link_libraries(my_openroad ${CUDD_LIB})
+  target_link_libraries(placement_applier ${CUDD_LIB})
 endif()
-# End my_openroad tool
+# End placement_applier tool
 ################################################################
 
 # messages(
