@@ -28,7 +28,10 @@ typedef Rect<int64_t> HotspotBBox;
 
 struct Hotspot {
     double disturbance;
+    int swap_count;
     HotspotBBox bbox;
+
+    Hotspot() : disturbance(0.0), swap_count(0), bbox{0, 0, 0, 0} {}
 };
 typedef std::vector<Hotspot> HotspotList;
 typedef std::unordered_map<std::string, HotspotList> GenerateConfigMap;

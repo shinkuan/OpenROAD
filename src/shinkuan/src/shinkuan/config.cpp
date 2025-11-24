@@ -12,6 +12,7 @@ Config::~Config() {}
 // #   name <name>
 // #   hotspot
 // #     disturbance <float>
+// #     swap_count <int>
 // #     bbox <l> <b> <r> <t>
 // #   end_hotspot
 // #   ...
@@ -98,6 +99,13 @@ int Config::parseGenerateBlock(std::ifstream& file) {
                         return 1;
                     }
                     hotspot.disturbance = disturbance;
+                } else if (hotspot_word == "swap_count") {
+                    int swap_count;
+                    if (!(hotspot_iss >> swap_count)) {
+                        logger.error("[Config] Missing swap_count value in hotspot.");
+                        return 1;
+                    }
+                    hotspot.swap_count = swap_count;
                 } else if (hotspot_word == "bbox") {
                     int64_t xl, yl, xh, yh;
                     if (!(hotspot_iss >> xl >> yl >> xh >> yh)) {

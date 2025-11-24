@@ -90,10 +90,9 @@ int DatasetGenerator::generateDatasets() {
         std::vector<std::vector<odb::dbInst*>> hotspot_instances_bottom_left(hotspot_list.size());
         std::vector<std::vector<odb::dbInst*>> hotspot_instances_bottom_right(hotspot_list.size());
         for (odb::dbInst* inst : block->getInsts()) {
+            odb::dbPlacementStatus status = inst->getPlacementStatus();
             if (
-                inst->isPlaced() == false ||
-                inst->isFixed() == true ||
-                inst->isDoNotTouch() == true
+                status != odb::dbPlacementStatus::PLACED
             ) {
                 continue;
             }
@@ -135,6 +134,8 @@ int DatasetGenerator::generateDatasets() {
             int64_t total_distance = 0;
             int64_t target_distance = static_cast<int64_t>(hotspot.disturbance *
                 (hotspot.bbox.xh - hotspot.bbox.xl + hotspot.bbox.yh - hotspot.bbox.yl) * 2 * hotspot_instances[i].size());
+            int64_t total_swaps = 0;
+            int64_t target_swaps = hotspot.swap_count;
 
             auto pick_random_instance = [&](std::vector<odb::dbInst*>& insts) -> odb::dbInst* {
                 std::uniform_int_distribution<size_t> dist(0, insts.size() - 1);
@@ -150,7 +151,15 @@ int DatasetGenerator::generateDatasets() {
                 return value < 0 ? -value : value;
             };
 
-            while (total_distance < target_distance) {
+            auto while_condition = [&]() -> bool {
+                if (target_swaps > 0) {
+                    return total_swaps < target_swaps;
+                } else {
+                    return total_distance < target_distance;
+                }
+            };
+
+            while (while_condition()) {
                 const bool has_tl_br = !hotspot_instances_top_left[i].empty() && !hotspot_instances_bottom_right[i].empty();
                 const bool has_tr_bl = !hotspot_instances_top_right[i].empty() && !hotspot_instances_bottom_left[i].empty();
                 if (!has_tl_br && !has_tr_bl) {
@@ -185,6 +194,7 @@ int DatasetGenerator::generateDatasets() {
                     continue;
                 }
                 total_distance += swap_distance;
+                total_swaps += 1;
             }
         }
 
