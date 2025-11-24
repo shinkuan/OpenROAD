@@ -153,7 +153,7 @@ if (ENABLE_TESTS)
 endif()
 
 find_package(Python3 COMPONENTS Development REQUIRED)
-option(BUILD_PYTHON "Build the Python3 interface" ON)
+option(BUILD_PYTHON "Build the Python3 interface" OFF)
 
 option(ALLOW_WARNINGS "Flag to allow compilation with compiler warnings: on by default" ON)
 if (NOT ALLOW_WARNINGS)
@@ -286,180 +286,299 @@ add_subdirectory(par)
 add_subdirectory(est)
 
 ################################################################
+add_subdirectory(shinkuan)
 
-add_executable(openroad
-  ${OPENROAD_SOURCE}
+################################################################
+
+# add_executable(openroad
+#   ${OPENROAD_SOURCE}
+# )
+
+# set_target_properties(openroad PROPERTIES
+#   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+# )
+
+# target_compile_options(openroad
+#   PRIVATE
+#     -Wextra -pedantic -Wcast-qual
+# )
+
+# # Needed for boost stacktrace
+# if(APPLE)
+#   target_compile_definitions(openroad PUBLIC "-D_GNU_SOURCE")
+# endif()
+
+
+# set_target_properties(openroad PROPERTIES
+#   # Disable compiler specific extensions like gnu++11.
+#   CXX_EXTENSIONS OFF
+#   # Export symbols for stack trace printing
+#   ENABLE_EXPORTS ON
+# )
+# target_compile_features(openroad PUBLIC cxx_std_17)
+
+# target_include_directories(openroad
+#   PUBLIC
+#     ../include
+# )
+
+# target_link_libraries(openroad
+#   ifp
+#   pad
+#   ord
+#   gpl
+#   dpl
+#   exa
+#   fin
+#   ram
+#   rsz
+#   ppl
+#   stt
+#   dbSta
+#   OpenSTA
+#   odb
+#   odbtcl
+#   rcx
+#   rmp
+#   cgt
+#   cts
+#   cut
+#   grt
+#   tap
+#   gui
+#   drt
+#   dst
+#   psm
+#   ant
+#   upf
+#   utl
+#   pdn
+#   dft
+#   mpl
+#   par
+#   est
+#   ${ABC_LIBRARY}
+#   ${TCL_LIBRARY}
+#   ${CMAKE_THREAD_LIBS_INIT}
+#   ${Boost_LIBRARIES}
+# )
+
+# target_compile_definitions(openroad PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+
+# # tclReadline
+# if (TCL_READLINE_LIBRARY AND TCL_READLINE_H)
+#   target_compile_definitions(openroad PRIVATE ENABLE_READLINE)
+#   target_link_libraries(openroad ${TCL_READLINE_LIBRARY})
+#   target_include_directories(openroad PRIVATE ${TCL_READLINE_H})
+#   message(STATUS "TCL readline enabled")
+# else()
+#   message(STATUS "TCL readline disabled")
+# endif()
+
+# if (BUILD_TCLX AND TCLX_LIBRARY AND TCLX_H)
+#   target_compile_definitions(openroad PRIVATE ENABLE_TCLX)
+#   target_link_libraries(openroad ${TCLX_LIBRARY})
+#   target_include_directories(openroad PRIVATE ${TCLX_H})
+#   message(STATUS "Tcl Extended enabled")
+# else()
+#   message(STATUS "Tcl Extended disabled")
+# endif()
+
+# if (ZLIB_FOUND)
+#   target_link_libraries(openroad ${ZLIB_LIBRARIES})
+# endif()
+
+# # Optional CUDD library for OpenSTA
+# if (CUDD_LIB)
+#   target_link_libraries(openroad ${CUDD_LIB})
+# endif()
+
+# if (Python3_FOUND AND BUILD_PYTHON)
+#   message(STATUS "Python3 enabled")
+#   target_compile_definitions(openroad PRIVATE ENABLE_PYTHON3)
+
+#   swig_lib(NAME      ord_py
+#            NAMESPACE ord
+#            LANGUAGE  python
+#            I_FILE    OpenRoad-py.i
+#            SCRIPTS   ${CMAKE_CURRENT_BINARY_DIR}/ord_py.py
+#   )
+
+#   target_link_libraries(ord_py
+#     PRIVATE
+#       dbSta
+#       odb
+#       OpenSTA
+#       ifp
+#   )
+#   target_link_libraries(openroad
+#     ord_py
+#     odb_py
+#     ifp_py
+#     utl_py
+#     ant_py
+#     grt_py
+#     gpl_py
+#     dpl_py
+#     exa_py
+#     ppl_py
+#     tap_py
+#     cgt_py
+#     cts_py
+#     drt_py
+#     fin_py
+# #    ram_py
+#     rcx_py
+#     rmp_py
+#     stt_py
+#     psm_py
+#     pdn_py
+#     dft_py
+#     par_py
+#   )
+
+# else()
+#   message(STATUS "Python3 disabled")
+# endif()
+
+
+################################################################
+# Build my_openroad tool
+
+add_executable(my_openroad
+  my_main.cpp
+
+  # Design.cc
+  # Timing.cc
+  # Tech.cc
+  # OpenRoad.cc
 )
 
-set_target_properties(openroad PROPERTIES
+target_compile_definitions(my_openroad PRIVATE GPU)
+target_compile_definitions(my_openroad PRIVATE BUILD_PYTHON=0)
+target_compile_definitions(my_openroad PRIVATE BUILD_GUI=0)
+
+set_target_properties(my_openroad PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-target_compile_options(openroad
+target_compile_options(my_openroad
   PRIVATE
     -Wextra -pedantic -Wcast-qual
 )
 
-# Needed for boost stacktrace
-if(APPLE)
-  target_compile_definitions(openroad PUBLIC "-D_GNU_SOURCE")
-endif()
+target_compile_features(my_openroad PUBLIC cxx_std_17)
 
-
-set_target_properties(openroad PROPERTIES
-  # Disable compiler specific extensions like gnu++11.
-  CXX_EXTENSIONS OFF
-  # Export symbols for stack trace printing
-  ENABLE_EXPORTS ON
-)
-target_compile_features(openroad PUBLIC cxx_std_17)
-
-target_include_directories(openroad
+target_include_directories(my_openroad
   PUBLIC
     ../include
 )
 
-target_link_libraries(openroad
-  ifp
-  pad
-  ord
-  gpl
-  dpl
-  exa
-  fin
-  ram
-  rsz
-  ppl
-  stt
-  dbSta
-  OpenSTA
+target_link_libraries(my_openroad
+  # ifp
+  # pad
+  # ord
+  # gpl
+  # dpl
+  # exa
+  # fin
+  # ram
+  # rsz
+  # ppl
+  # stt
+  # dbSta
+  # OpenSTA
   odb
-  odbtcl
-  rcx
-  rmp
-  cgt
-  cts
-  cut
-  grt
-  tap
-  gui
-  drt
-  dst
-  psm
-  ant
-  upf
-  utl
-  pdn
-  dft
-  mpl
-  par
-  est
-  ${ABC_LIBRARY}
-  ${TCL_LIBRARY}
+  # odbtcl
+  # rcx
+  # rmp
+  # cgt
+  # cts
+  # cut
+  # grt
+  # tap
+  # gui
+  # drt
+  # dst
+  # psm
+  # ant
+  # upf
+  # utl
+  # pdn
+  # dft
+  # mpl
+  # par
+  # est
+  # ${ABC_LIBRARY}
+  # ${TCL_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
+  shinkuan
 )
 
-target_compile_definitions(openroad PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+target_compile_definitions(my_openroad PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+
 
 # tclReadline
 if (TCL_READLINE_LIBRARY AND TCL_READLINE_H)
-  target_compile_definitions(openroad PRIVATE ENABLE_READLINE)
-  target_link_libraries(openroad ${TCL_READLINE_LIBRARY})
-  target_include_directories(openroad PRIVATE ${TCL_READLINE_H})
+  target_compile_definitions(my_openroad PRIVATE ENABLE_READLINE)
+  target_link_libraries(my_openroad ${TCL_READLINE_LIBRARY})
+  target_include_directories(my_openroad PRIVATE ${TCL_READLINE_H})
   message(STATUS "TCL readline enabled")
 else()
   message(STATUS "TCL readline disabled")
 endif()
 
 if (BUILD_TCLX AND TCLX_LIBRARY AND TCLX_H)
-  target_compile_definitions(openroad PRIVATE ENABLE_TCLX)
-  target_link_libraries(openroad ${TCLX_LIBRARY})
-  target_include_directories(openroad PRIVATE ${TCLX_H})
+  target_compile_definitions(my_openroad PRIVATE ENABLE_TCLX)
+  target_link_libraries(my_openroad ${TCLX_LIBRARY})
+  target_include_directories(my_openroad PRIVATE ${TCLX_H})
   message(STATUS "Tcl Extended enabled")
 else()
   message(STATUS "Tcl Extended disabled")
 endif()
 
 if (ZLIB_FOUND)
-  target_link_libraries(openroad ${ZLIB_LIBRARIES})
+  target_link_libraries(my_openroad ${ZLIB_LIBRARIES})
 endif()
 
 # Optional CUDD library for OpenSTA
 if (CUDD_LIB)
-  target_link_libraries(openroad ${CUDD_LIB})
+  target_link_libraries(my_openroad ${CUDD_LIB})
 endif()
 
-if (Python3_FOUND AND BUILD_PYTHON)
-  message(STATUS "Python3 enabled")
-  target_compile_definitions(openroad PRIVATE ENABLE_PYTHON3)
-
-  swig_lib(NAME      ord_py
-           NAMESPACE ord
-           LANGUAGE  python
-           I_FILE    OpenRoad-py.i
-           SCRIPTS   ${CMAKE_CURRENT_BINARY_DIR}/ord_py.py
-  )
-
-  target_link_libraries(ord_py
-    PRIVATE
-      dbSta
-      odb
-      OpenSTA
-      ifp
-  )
-  target_link_libraries(openroad
-    ord_py
-    odb_py
-    ifp_py
-    utl_py
-    ant_py
-    grt_py
-    gpl_py
-    dpl_py
-    exa_py
-    ppl_py
-    tap_py
-    cgt_py
-    cts_py
-    drt_py
-    fin_py
-#    ram_py
-    rcx_py
-    rmp_py
-    stt_py
-    psm_py
-    pdn_py
-    dft_py
-    par_py
-  )
-
-else()
-  message(STATUS "Python3 disabled")
+if (ZLIB_FOUND)
+  target_link_libraries(my_openroad ${ZLIB_LIBRARIES})
 endif()
 
-messages(
-  TARGET openroad
-  SOURCE_DIR .
-  OUTPUT_DIR ..
-  LOCAL
-)
+if (CUDD_LIB)
+  target_link_libraries(my_openroad ${CUDD_LIB})
+endif()
+# End my_openroad tool
+################################################################
+
+# messages(
+#   TARGET openroad
+#   SOURCE_DIR .
+#   OUTPUT_DIR ..
+#   LOCAL
+# )
 
 # Ancient versions of glibc found on CentOS required librt.
 # OSX has an empty version of librt that causes a link error,
 # so this is protected from linking there.
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-    AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  find_library(LIBRT rt)
-  target_link_libraries(openroad ${LIBRT})
-endif()
+# if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+#     AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#   find_library(LIBRT rt)
+#   target_link_libraries(openroad ${LIBRT})
+# endif()
 
 ################################################################
 # Install
 # cmake .. -DCMAKE_INSTALL_PREFIX=<prefix_path>
 
 # executable
-install(TARGETS openroad DESTINATION bin)
+# install(TARGETS openroad DESTINATION bin)
 
 ################################################################
 
