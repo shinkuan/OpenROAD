@@ -1,5 +1,5 @@
-#ifndef __PLACMENT_APPLIER_H__
-#define __PLACMENT_APPLIER_H__
+#ifndef __DRV_EXTRACTOR_H__
+#define __DRV_EXTRACTOR_H__
 
 #include <string>
 #include <random>
@@ -13,12 +13,12 @@
 
 namespace shinkuan {
 
-class PlacementApplier {
+class DRVExtractor {
 public:
-    PlacementApplier();
-    ~PlacementApplier();
+    DRVExtractor();
+    ~DRVExtractor();
 
-    int run(const std::string& inputODBFile, const std::string& inputPlacementTxt, const std::string& outputDir);
+    int run(const std::string& inputODBFile, const std::string& outputDir);
 
 private:
     std::mt19937 rng;
@@ -34,4 +34,4 @@ private:
 
 } // namespace shinkuan
 
-#endif // __PLACMENT_APPLIER_H__
+#endif // __DRV_EXTRACTOR_H__

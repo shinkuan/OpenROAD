@@ -443,9 +443,9 @@ add_subdirectory(shinkuan)
 
 
 ################################################################
-# Build placement_applier tool
+# Build drv_extractor tool
 
-add_executable(placement_applier
+add_executable(drv_extractor
   my_main.cpp
 
   # Design.cc
@@ -454,27 +454,27 @@ add_executable(placement_applier
   # OpenRoad.cc
 )
 
-target_compile_definitions(placement_applier PRIVATE GPU)
-target_compile_definitions(placement_applier PRIVATE BUILD_PYTHON=0)
-target_compile_definitions(placement_applier PRIVATE BUILD_GUI=0)
+target_compile_definitions(drv_extractor PRIVATE GPU)
+target_compile_definitions(drv_extractor PRIVATE BUILD_PYTHON=0)
+target_compile_definitions(drv_extractor PRIVATE BUILD_GUI=0)
 
-set_target_properties(placement_applier PROPERTIES
+set_target_properties(drv_extractor PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-target_compile_options(placement_applier
+target_compile_options(drv_extractor
   PRIVATE
     -Wextra -pedantic -Wcast-qual
 )
 
-target_compile_features(placement_applier PUBLIC cxx_std_17)
+target_compile_features(drv_extractor PUBLIC cxx_std_17)
 
-target_include_directories(placement_applier
+target_include_directories(drv_extractor
   PUBLIC
     ../include
 )
 
-target_link_libraries(placement_applier
+target_link_libraries(drv_extractor
   # ifp
   # pad
   # ord
@@ -516,45 +516,45 @@ target_link_libraries(placement_applier
   shinkuan
 )
 
-target_compile_definitions(placement_applier PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+target_compile_definitions(drv_extractor PRIVATE BUILD_TYPE="${CMAKE_BUILD_TYPE}")
 
 
 # tclReadline
 if (TCL_READLINE_LIBRARY AND TCL_READLINE_H)
-  target_compile_definitions(placement_applier PRIVATE ENABLE_READLINE)
-  target_link_libraries(placement_applier ${TCL_READLINE_LIBRARY})
-  target_include_directories(placement_applier PRIVATE ${TCL_READLINE_H})
+  target_compile_definitions(drv_extractor PRIVATE ENABLE_READLINE)
+  target_link_libraries(drv_extractor ${TCL_READLINE_LIBRARY})
+  target_include_directories(drv_extractor PRIVATE ${TCL_READLINE_H})
   message(STATUS "TCL readline enabled")
 else()
   message(STATUS "TCL readline disabled")
 endif()
 
 if (BUILD_TCLX AND TCLX_LIBRARY AND TCLX_H)
-  target_compile_definitions(placement_applier PRIVATE ENABLE_TCLX)
-  target_link_libraries(placement_applier ${TCLX_LIBRARY})
-  target_include_directories(placement_applier PRIVATE ${TCLX_H})
+  target_compile_definitions(drv_extractor PRIVATE ENABLE_TCLX)
+  target_link_libraries(drv_extractor ${TCLX_LIBRARY})
+  target_include_directories(drv_extractor PRIVATE ${TCLX_H})
   message(STATUS "Tcl Extended enabled")
 else()
   message(STATUS "Tcl Extended disabled")
 endif()
 
 if (ZLIB_FOUND)
-  target_link_libraries(placement_applier ${ZLIB_LIBRARIES})
+  target_link_libraries(drv_extractor ${ZLIB_LIBRARIES})
 endif()
 
 # Optional CUDD library for OpenSTA
 if (CUDD_LIB)
-  target_link_libraries(placement_applier ${CUDD_LIB})
+  target_link_libraries(drv_extractor ${CUDD_LIB})
 endif()
 
 if (ZLIB_FOUND)
-  target_link_libraries(placement_applier ${ZLIB_LIBRARIES})
+  target_link_libraries(drv_extractor ${ZLIB_LIBRARIES})
 endif()
 
 if (CUDD_LIB)
-  target_link_libraries(placement_applier ${CUDD_LIB})
+  target_link_libraries(drv_extractor ${CUDD_LIB})
 endif()
-# End placement_applier tool
+# End drv_extractor tool
 ################################################################
 
 # messages(
