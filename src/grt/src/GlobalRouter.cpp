@@ -101,7 +101,7 @@ GlobalRouter::GlobalRouter(utl::Logger* logger,
 {
   fastroute_
       = new FastRouteCore(db_, logger_, callback_handler_, stt_builder_, sta_);
-  cugr_ = new CUGR(db_, logger_, stt_builder_);
+  cugr_ = new CUGR(db_, logger_, stt_builder_, sta_);
 }
 
 void GlobalRouter::initGui(std::unique_ptr<AbstractRoutingCongestionDataSource>
@@ -217,7 +217,7 @@ NetRouteMap GlobalRouter::getPartialRoutes()
 {
   NetRouteMap net_routes;
   // TODO: still need to fix this during incremental grt
-  if (is_incremental) {
+  if (is_incremental_) {
     for (const auto& [db_net, net] : db_net_map_) {
       if (routes_[db_net].empty()) {
         GRoute route;
@@ -304,7 +304,7 @@ void GlobalRouter::globalRoute(bool save_guides,
                                bool end_incremental)
 {
   bool has_routable_nets = false;
-  is_incremental = (start_incremental || end_incremental);
+  is_incremental_ = (start_incremental || end_incremental);
 
   for (auto net : db_->getChip()->getBlock()->getNets()) {
     if (net->getITerms().size() + net->getBTerms().size() > 1) {
@@ -350,7 +350,9 @@ void GlobalRouter::globalRoute(bool save_guides,
         if (use_cugr_) {
           int min_layer, max_layer;
           getMinMaxLayer(min_layer, max_layer);
-          cugr_->init(min_layer, max_layer);
+          std::set<odb::dbNet*> clock_nets;
+          findClockNets(nets, clock_nets);
+          cugr_->init(min_layer, max_layer, clock_nets);
           cugr_->route();
           routes_ = cugr_->getRoutes();
         } else {
@@ -575,6 +577,7 @@ std::vector<int> GlobalRouter::routeLayerLengths(odb::dbNet* db_net)
   if (!db_net->getSigType().isSupply()) {
     GRoute& route = routes[db_net];
     std::set<RoutePt> route_pts;
+    // Compute wirelengths from route segments
     for (GSegment& segment : route) {
       if (segment.isVia()) {
         auto& s = segment;
@@ -595,18 +598,11 @@ std::vector<int> GlobalRouter::routeLayerLengths(odb::dbNet* db_net)
     }
 
     Net* net = getNet(db_net);
+    // Compute wirelength from pin position on grid to real pin location
     for (Pin& pin : net->getPins()) {
       int layer = pin.getConnectionLayer() + 1;
       odb::Point grid_pt = pin.getOnGridPosition();
       odb::Point pt = pin.getPosition();
-
-      std::map<int, std::vector<PointPair>> ap_positions;
-      bool has_access_points = findPinAccessPointPositions(pin, ap_positions);
-      if (has_access_points) {
-        auto ap_position = ap_positions[0].front();
-        pt = ap_position.first;
-        grid_pt = ap_position.second;
-      }
 
       RoutePt grid_route(grid_pt.getX(), grid_pt.getY(), layer);
       auto pt_itr = route_pts.find(grid_route);
@@ -1408,7 +1404,7 @@ std::vector<LayerId> GlobalRouter::findTransitionLayers()
     int via_width = 0;
     for (const auto box : default_vias[tech_layer]->getBoxes()) {
       if (box->getTechLayer() == tech_layer) {
-        via_width = vertical ? box->getWidth() : box->getLength();
+        via_width = vertical ? box->getDY() : box->getDX();
         break;
       }
     }
@@ -3487,8 +3483,8 @@ void getViaDims(std::map<odb::dbTechLayer*, odb::dbTechVia*> default_vias,
   if (default_vias.find(tech_layer) != default_vias.end()) {
     for (auto box : default_vias[tech_layer]->getBoxes()) {
       if (box->getTechLayer() == tech_layer) {
-        width_up = std::min(box->getWidth(), box->getLength());
-        prl_up = std::max(box->getWidth(), box->getLength());
+        width_up = std::min(box->getDX(), box->getDY());
+        prl_up = std::max(box->getDX(), box->getDY());
         break;
       }
     }
@@ -3496,8 +3492,8 @@ void getViaDims(std::map<odb::dbTechLayer*, odb::dbTechVia*> default_vias,
   if (default_vias.find(bottom_layer) != default_vias.end()) {
     for (auto box : default_vias[bottom_layer]->getBoxes()) {
       if (box->getTechLayer() == tech_layer) {
-        width_down = std::min(box->getWidth(), box->getLength());
-        prl_down = std::max(box->getWidth(), box->getLength());
+        width_down = std::min(box->getDX(), box->getDY());
+        prl_down = std::max(box->getDX(), box->getDY());
         break;
       }
     }
@@ -3770,6 +3766,7 @@ std::vector<Net*> GlobalRouter::findNets(bool init_clock_nets)
     if (net) {
       bool is_non_leaf_clock = isNonLeafClock(net->getDbNet());
       if (is_non_leaf_clock) {
+        net->setIsClockNet(true);
         clk_nets.push_back(net);
       }
     }
@@ -3792,6 +3789,16 @@ std::vector<Net*> GlobalRouter::findNets(bool init_clock_nets)
   nets.insert(nets.end(), non_clk_nets.begin(), non_clk_nets.end());
 
   return nets;
+}
+
+void GlobalRouter::findClockNets(const std::vector<Net*>& nets,
+                                 std::set<odb::dbNet*>& clock_nets)
+{
+  for (Net* net : nets) {
+    if (net->isClockNet()) {
+      clock_nets.insert(net->getDbNet());
+    }
+  }
 }
 
 Net* GlobalRouter::addNet(odb::dbNet* db_net)

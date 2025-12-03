@@ -152,7 +152,7 @@ class _dbBlock : public _dbObject
   };
 
   // PERSISTANT-MEMBERS
-  _dbBlockFlags _flags;
+  _dbBlockFlags flags_;
   int _def_units;
   int _dbu_per_micron;  // cached value from dbTech
   char _hier_delimiter;
@@ -181,7 +181,6 @@ class _dbBlock : public _dbObject
   dbHashTable<_dbLogicPort> _logicport_hash;
   dbHashTable<_dbPowerSwitch> _powerswitch_hash;
   dbHashTable<_dbIsolation> _isolation_hash;
-  dbHashTable<_dbMarkerCategory> _marker_category_hash;
 
   dbHashTable<_dbLevelShifter> _levelshifter_hash;
   dbHashTable<_dbGroup> _group_hash;
@@ -241,7 +240,6 @@ class _dbBlock : public _dbObject
   dbTable<_dbNetTrack>* _net_tracks_tbl;
   _dbNameCache* _name_cache;
   dbTable<_dbDft, 4096>* _dft_tbl;
-  dbTable<_dbMarkerCategory>* _marker_categories_tbl;
 
   dbPagedVector<float, 4096, 12>* _r_val_tbl;
   dbPagedVector<float, 4096, 12>* _c_val_tbl;
@@ -309,7 +307,7 @@ class _dbBlock : public _dbObject
   void add_rect(const Rect& rect);
   void add_oct(const Oct& oct);
   void remove_rect(const Rect& rect);
-  void invalidate_bbox() { _flags._valid_bbox = 0; }
+  void invalidate_bbox() { flags_._valid_bbox = 0; }
   void initialize(_dbChip* chip,
                   _dbBlock* parent,
                   const char* name,
