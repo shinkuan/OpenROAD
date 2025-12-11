@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {   
     if (argc != 4) {
-        logger.error("Usage: %s <input_odb_file> <config_file> <output_dir>", argv[0]);
+        logger.error("Usage: %s <input_odb_file> <input_placement_txt> <output_dir>", argv[0]);
         return 1;
     }
 
@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
     // }
 
     const std::string inputODBFile = argv[1];
-    const std::string configFile = argv[2];
+    const std::string inputPlacementTxt = argv[2];
     const std::string outputDir = argv[3];
 
-    shinkuan::PlacementApplier dataset_generator;
-    if (dataset_generator.run(inputODBFile, configFile, outputDir) != 0) {
+    shinkuan::PlacementApplier placement_applier;
+    if (placement_applier.run(inputODBFile, inputPlacementTxt, outputDir) != 0) {
         logger.error("Dataset generation failed.");
         return 1;
     }
