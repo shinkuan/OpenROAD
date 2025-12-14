@@ -102,6 +102,10 @@ int PlacementApplier::loadDatabaseFromFile_(const std::string& filename, odb::db
         return 1;
     }
     *db_ptr = odb::dbDatabase::create();
+    logger.info("Creating utl::Logger instance for database operations.");
+    utl::Logger* utl_logger = new utl::Logger();
+    logger.info("utl::Logger instance created successfully.");
+    (*db_ptr)->setLogger(utl_logger);
     (*db_ptr)->read(input_file);
     if ((*db_ptr)->getChips().empty()) {
         logger.error("No chips found in the database.");
@@ -110,11 +114,6 @@ int PlacementApplier::loadDatabaseFromFile_(const std::string& filename, odb::db
     logger.info("Chips in database: %zu", (*db_ptr)->getChips().size());
     logger.info("Database loaded successfully from file: %s", filename.c_str());
     input_file.close();
-
-    logger.info("Creating utl::Logger instance for database operations.");
-    utl::Logger* utl_logger = new utl::Logger();
-    logger.info("utl::Logger instance created successfully.");
-    (*db_ptr)->setLogger(utl_logger);
     return 0;
 }
 
